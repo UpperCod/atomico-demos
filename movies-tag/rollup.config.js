@@ -9,7 +9,6 @@ export default {
         format: "iife",
         sourcemap: true
     },
-    external: ["preact"],
     plugins: [
         resolve(),
         buble({
