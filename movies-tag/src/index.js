@@ -30,20 +30,36 @@ customElements.define(
             `;
         }
         elementMount() {
-            this.fetch(1).then(data => this.setState(data));
+            this.fetch(1);
         }
 
         fetch(page) {
+            if (this.prevent) return;
+            this.prevent = true;
             return fetch(
                 `https://api.themoviedb.org/3/discover/movie?page=${page}&primary_release_date.gte=2014-09-15&primary_release_date.lte=2014-10-22&api_key=a361f80e17f8fb69899e2088cb413984`
-            ).then(data => data.json());
+            )
+                .then(data => data.json())
+                .then(data => {
+                    this.setState(data);
+                    this.prevent = false;
+                });
         }
         render() {
             console.log(this.state);
             return (
                 <div class="box">
                     <style>{this.css()}</style>
-                    <movie-header title="Trending movies" />
+                    <movie-header
+                        title="Trending movies"
+                        page={this.state.page}
+                        prev={() => {
+                            this.fetch(this.state.page - 1);
+                        }}
+                        next={() => {
+                            this.fetch(this.state.page + 1);
+                        }}
+                    />
                     <div class="list">
                         {(this.state.results || []).map(props => (
                             <movie-preview
